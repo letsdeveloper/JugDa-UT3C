@@ -28,20 +28,17 @@ public class TicTacToeTest {
 
 	@Test
 	public void canMove() {
-		assertTrue("Can not move :(", gameUnderTest.canMove(0, 0));
-		assertTrue("Can not move :(", gameUnderTest.canMove(0, 1));
-		assertTrue("Can not move :(", gameUnderTest.canMove(0, 2));
-		assertTrue("Can not move :(", gameUnderTest.canMove(1, 0));
-		assertTrue("Can not move :(", gameUnderTest.canMove(1, 1));
-		assertTrue("Can not move :(", gameUnderTest.canMove(1, 2));
-		assertTrue("Can not move :(", gameUnderTest.canMove(2, 0));
-		assertTrue("Can not move :(", gameUnderTest.canMove(2, 1));
-		assertTrue("Can not move :(", gameUnderTest.canMove(2, 2));
+		assertMovesPossible(new Field(0, 0), new Field(0, 1), new Field(0, 2), new Field(1, 0),
+				new Field(1, 1), new Field(1, 2), new Field(2, 0), new Field(2, 1), new Field(2, 2));
+	}
+
+	private void assertMovesPossible(Field... fields) {
+		Arrays.stream(fields).forEach(field -> assertTrue("Can not move :(", gameUnderTest.canMove(field)));
 	}
 
 	@Test
 	public void returnPlayerOnField() {
-		Player owner = gameUnderTest.getPlayerOn(0, 0);
+		Player owner = gameUnderTest.getPlayerOn(new Field(0, 0));
 
 		assertThat(owner, is(Player.NONE));
 	}
@@ -49,7 +46,7 @@ public class TicTacToeTest {
 	@Test
 	public void setPlayerOnMove() {
 		gameUnderTest.move(new Field(0, 0));
-		Player owner = gameUnderTest.getPlayerOn(0, 0);
+		Player owner = gameUnderTest.getPlayerOn(new Field(0, 0));
 
 		assertThat(owner, is(Player.X));
 	}
@@ -57,7 +54,7 @@ public class TicTacToeTest {
 	@Test
 	public void setPlayerOnMoveOnlyOnMovedField() {
 		gameUnderTest.move(new Field(0, 1));
-		Player owner = gameUnderTest.getPlayerOn(0, 0);
+		Player owner = gameUnderTest.getPlayerOn(new Field(0, 0));
 
 		assertThat(owner, is(Player.NONE));
 	}
@@ -65,7 +62,7 @@ public class TicTacToeTest {
 	@Test
 	public void setPlayerXOnMoveOnMovedField() {
 		gameUnderTest.move(new Field(0, 1));
-		Player owner = gameUnderTest.getPlayerOn(0, 1);
+		Player owner = gameUnderTest.getPlayerOn(new Field(0, 1));
 
 		assertThat(owner, is(Player.X));
 	}
@@ -90,7 +87,7 @@ public class TicTacToeTest {
 	@Test
 	public void canNotMoveOnOccupiedField() {
 		gameUnderTest.move(new Field(0, 0));
-		boolean canMove = gameUnderTest.canMove(0, 0);
+		boolean canMove = gameUnderTest.canMove(new Field(0, 0));
 
 		assertFalse("Can move! :o", canMove);
 	}
@@ -100,40 +97,30 @@ public class TicTacToeTest {
 		gameUnderTest.move(new Field(0, 0));
 		gameUnderTest.move(new Field(0, 1));
 
-		Player owner = gameUnderTest.getPlayerOn(0, 1);
+		Player owner = gameUnderTest.getPlayerOn(new Field(0, 1));
 
 		assertThat(owner, is(Player.O));
 	}
 
 	@Test
 	public void canNotMoveOutsideBoard() {
-		assertFalse("Can move! :o", gameUnderTest.canMove(-1, -1));
-		assertFalse("Can move! :o", gameUnderTest.canMove(0, -1));
-		assertFalse("Can move! :o", gameUnderTest.canMove(-1, 0));
-		assertFalse("Can move! :o", gameUnderTest.canMove(3, 3));
-		assertFalse("Can move! :o", gameUnderTest.canMove(3, 2));
-		assertFalse("Can move! :o", gameUnderTest.canMove(2, 3));
-		assertFalse("Can move! :o", gameUnderTest.canMove(2, -1));
-		assertFalse("Can move! :o", gameUnderTest.canMove(3, -1));
-		assertFalse("Can move! :o", gameUnderTest.canMove(3, 0));
-		assertFalse("Can move! :o", gameUnderTest.canMove(-1, 2));
-		assertFalse("Can move! :o", gameUnderTest.canMove(-1, 3));
-		assertFalse("Can move! :o", gameUnderTest.canMove(0, 3));
+		assertMovesImpossible(new Field(-1, -1), new Field(0, -1), new Field(-1, 0), new Field(3, 3), new Field(3, 2),
+				new Field(2, 3), new Field(2, -1), new Field(3, -1), new Field(3, 0), new Field(-1, 2),
+				new Field(-1, 3), new Field(0, 3));
+	}
+
+	private void assertMovesImpossible(Field... fields) {
+		Arrays.stream(fields).forEach(field -> assertFalse("Can move! :o", gameUnderTest.canMove(field)));
 	}
 
 	@Test
 	public void isGameNotOverInitially() {
-		boolean gameOver = gameUnderTest.isGameOver();
-
-		assertFalse("Game not over", gameOver);
+		assertGameNotOverAfterMoves(/* none */);
 	}
 
 	@Test
 	public void isGameNotOver() {
-		gameUnderTest.move(new Field(0, 0));
-		boolean gameOver = gameUnderTest.isGameOver();
-
-		assertFalse("Game over", gameOver);
+		assertGameNotOverAfterMoves(new Field(0, 0));
 	}
 
 	@Test
@@ -180,5 +167,12 @@ public class TicTacToeTest {
 		Arrays.stream(fields).forEach(f -> gameUnderTest.move(f));
 		boolean gameOver = gameUnderTest.isGameOver();
 		assertTrue("Game not over", gameOver);
+	}
+
+	private void assertGameNotOverAfterMoves(Field... fields) {
+		Arrays.stream(fields).forEach(f -> gameUnderTest.move(f));
+		boolean gameOver = gameUnderTest.isGameOver();
+
+		assertFalse("Game over", gameOver);
 	}
 }

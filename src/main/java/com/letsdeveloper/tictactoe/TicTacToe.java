@@ -1,6 +1,7 @@
 package com.letsdeveloper.tictactoe;
 
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
@@ -8,74 +9,56 @@ import java.util.stream.IntStream;
 
 public class TicTacToe {
 
-	private final Player[][] board = new Player[3][3];
+	private final Set<Cell> cells;
+	private final Set<House> houses;
 
 	private Player currentPlayer = Player.X;
 
 	public TicTacToe() {
-		Arrays.fill(board[0], Player.NONE);
-		Arrays.fill(board[1], Player.NONE);
-		Arrays.fill(board[2], Player.NONE);
+		cells = IntStream.range(0, 9).mapToObj(index -> new Cell(new Field(index % 3, index / 3)))
+				.collect(Collectors.toSet());
+		houses = new HashSet<House>();
+		houses.add(createHouse(index -> new Field(index, 0)));
+		houses.add(createHouse(index -> new Field(index, 1)));
+		houses.add(createHouse(index -> new Field(index, 2)));
+		houses.add(createHouse(index -> new Field(0, index)));
+		houses.add(createHouse(index -> new Field(1, index)));
+		houses.add(createHouse(index -> new Field(2, index)));
+		houses.add(createHouse(index -> new Field(index, index)));
+		houses.add(createHouse(index -> new Field(index, 2 - index)));
+	}
+
+	private House createHouse(IntFunction<Field> fct) {
+		IntFunction<Cell> mapper = index -> findCell(fct.apply(index)).get();
+		return new House(IntStream.range(0, 3).mapToObj(mapper).collect(Collectors.toSet()));
 	}
 
 	public Player getNextPlayer() {
 		return currentPlayer;
 	}
 
-	public boolean canMove(int row, int column) {
-		return isOnBoard(row, column) && getPlayerOn(row, column) == Player.NONE;
+	public boolean canMove(Field field) {
+		return isOnBoard(field) && getPlayerOn(field) == Player.NONE;
 	}
 
-	private boolean isOnBoard(int row, int column) {
-		return (row >= 0 && row < board.length) && (column >= 0 && column < board[0].length);
+	private boolean isOnBoard(Field field) {
+		return findCell(field).isPresent();
+	}
+
+	private Optional<Cell> findCell(Field field) {
+		return cells.stream().filter(cell -> cell.getField().equals(field)).findAny();
 	}
 
 	public void move(Field field) {
-		board[field.getRow()][field.getColumn()] = currentPlayer;
+		findCell(field).get().setOwner(currentPlayer);
 		currentPlayer = currentPlayer == Player.X ? Player.O : Player.X;
 	}
 
-	public Player getPlayerOn(int row, int column) {
-		return board[row][column];
+	public Player getPlayerOn(Field field) {
+		return findCell(field).get().getOwner();
 	}
 
 	public boolean isGameOver() {
-		boolean winnerInRow = IntStream.range(0, board.length).anyMatch(row -> isRowOwnedBySinglePlayer(row));
-		boolean winnerInColumn = IntStream.range(0, board.length).anyMatch(row -> isColumnOwnedBySinglePlayer(row));
-		boolean winnerInDiagonal = isSinglePlayer(getPlayersInDiagonal1()) || isSinglePlayer(getPlayersInDiagonal2());
-		return winnerInRow || winnerInColumn || winnerInDiagonal;
+		return houses.stream().anyMatch(house -> house.isSinglePlayer());
 	}
-
-	private boolean isColumnOwnedBySinglePlayer(int row) {
-		return isSinglePlayer(getPlayersInColumn(row));
-	}
-
-	private boolean isRowOwnedBySinglePlayer(int row) {
-		return isSinglePlayer(getPlayersInRow(row));
-	}
-
-	private boolean isSinglePlayer(Set<Player> players) {
-		return players.size() == 1 && !players.contains(Player.NONE);
-	}
-
-	private Set<Player> getPlayersInRow(int row) {
-		return Arrays.stream(board[row]).collect(Collectors.toSet());
-	}
-
-	private Set<Player> getPlayersInColumn(int column) {
-		return Arrays.stream(board).map(row -> row[column]).collect(Collectors.toSet());
-	}
-
-	private Set<Player> getPlayersInDiagonal1() {
-		return getPlayers(index -> board[index][index]);
-	}
-
-	private Set<Player> getPlayersInDiagonal2() {
-		return getPlayers(index -> board[index][board.length - 1 - index]);
-	}
-
-	private Set<Player> getPlayers(IntFunction<Player> mappingFunction) {
-		return IntStream.range(0, board.length).mapToObj(mappingFunction).collect(Collectors.toSet());
-	}
-
 }

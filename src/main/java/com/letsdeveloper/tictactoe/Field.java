@@ -1,10 +1,10 @@
 package com.letsdeveloper.tictactoe;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
 @AllArgsConstructor
-@Getter
+@Data
 public class Field {
 	private final int row, column;
 }
