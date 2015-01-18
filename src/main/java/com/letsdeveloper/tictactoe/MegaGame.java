@@ -1,10 +1,14 @@
 package com.letsdeveloper.tictactoe;
 
 import gameloop.Game;
+import lombok.RequiredArgsConstructor;
 
-public class TicTacToeGame implements Game {
+import com.letsdeveloper.game.BaseGame;
 
-	private final TicTacToe game = new TicTacToe();
+@RequiredArgsConstructor
+public class MegaGame implements Game {
+
+	private final BaseGame game;
 
 	private String message;
 
@@ -29,10 +33,10 @@ public class TicTacToeGame implements Game {
 		System.out.println(message);
 		System.out.println();
 
-		System.out.println("+-+-+-+");
-		for (int column = 0; column < 3; column++) {
+		printRowSeparator();
+		for (int row = 0; row < game.getNumRows(); row++) {
 			System.out.print("|");
-			for (int row = 0; row < 3; row++) {
+			for (int column = 0; column < game.getNumRows(); column++) {
 				Player owner = game.getPlayerOn(new Field(row, column));
 				String output = " ";
 				if (owner == Player.X) {
@@ -43,7 +47,7 @@ public class TicTacToeGame implements Game {
 				System.out.print(output + "|");
 			}
 			System.out.println();
-			System.out.println("+-+-+-+");
+			printRowSeparator();
 		}
 
 		if (game.isGameOver()) {
@@ -51,6 +55,13 @@ public class TicTacToeGame implements Game {
 		} else {
 			System.out.println("Next turn: " + game.getNextPlayer());
 		}
+	}
+
+	private void printRowSeparator() {
+		for (int i = 0; i < game.getNumRows(); i++) {
+			System.out.print("+-");
+		}
+		System.out.println("+");
 	}
 
 }

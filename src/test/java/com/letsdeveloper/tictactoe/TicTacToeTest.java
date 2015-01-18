@@ -10,9 +10,11 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.letsdeveloper.game.BaseGame;
+
 public class TicTacToeTest {
 
-	private TicTacToe gameUnderTest;
+	private BaseGame gameUnderTest;
 
 	@Before
 	public void setUpGame() {

@@ -4,7 +4,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Data class Cell {
+@Data
+public class Cell {
 	private final Field field;
 	private Player owner = Player.NONE;
 }

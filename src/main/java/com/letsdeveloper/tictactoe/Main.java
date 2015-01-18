@@ -5,9 +5,11 @@ import gameloop.InputHandler;
 
 import java.util.Scanner;
 
+import com.letsdeveloper.connectfour.ConnectFour;
+
 public class Main {
 	public static void main(String[] args) {
-		new GameLoop(new TicTacToeGame(), new InputHandler() {
+		new GameLoop(new MegaGame(new ConnectFour()), new InputHandler() {
 
 			@SuppressWarnings("resource")
 			@Override

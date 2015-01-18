@@ -1,6 +1,6 @@
 package com.letsdeveloper.tictactoe;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -10,14 +10,33 @@ import lombok.Data;
 @Data
 public class House {
 
-	private final Set<Cell> cells;
+	private final int c;
+	private final List<Cell> cells;
 
-	boolean isSinglePlayer() {
-		Set<Player> players = getPlayers();
-		return players.size() == 1 && !players.contains(Player.NONE);
+	public boolean isWinner() {
+		List<Player> players = getPlayers();
+		Player last = null;
+		int count = 0;
+		for (Player player : players) {
+			if (player == Player.NONE) {
+				continue;
+			}
+
+			if (last == null || !last.equals(player)) {
+				last = player;
+				count = 1;
+			}
+			else {
+				count++;
+			}
+			if (count == c) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-	private Set<Player> getPlayers() {
-		return getCells().stream().map(cell -> cell.getOwner()).collect(Collectors.toSet());
+	private List<Player> getPlayers() {
+		return getCells().stream().map(cell -> cell.getOwner()).collect(Collectors.toList());
 	}
 }
